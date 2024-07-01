@@ -4,3 +4,4 @@ pandas
 matplotlib
 pandasai
 PyYAML
+google.generativeai
