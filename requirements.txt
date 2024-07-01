@@ -1,1 +1,5 @@
+numpy
 streamlit
+pandas
+matplotlib
+pandasai
