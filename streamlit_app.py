@@ -2,6 +2,7 @@ from pandasai import SmartDataframe
 from pandasai.llm import GooglePalm
 import streamlit as st
 import pandas as pd
+import yaml 
 
 def chat_with_csv(df, query):
     llm = GooglePalm(api_key="AIzaSyCFZdU4u6NSI1iqHdDeHK2YOLOq6k3fN2M")
