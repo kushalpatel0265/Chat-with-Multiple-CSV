@@ -16,9 +16,7 @@ def submit_query():
     if input_text:
         result = chat_with_csv(data, input_text)
         if isinstance(result, pd.DataFrame):
-            # Convert DataFrame to markdown for display purposes
-            result = "Data Table Displayed Below"
-            st.session_state.chat_history.append((input_text, result))
+            st.session_state.chat_history.append((input_text, "Data Table Displayed Below"))
             st.session_state.displayed_result = result
         elif isinstance(result, str) and result.endswith(".png"):
             image_path = os.path.join('/mount/src/chat-with-multiple-csv/exports/charts', result)
@@ -43,7 +41,7 @@ if 'input_text' not in st.session_state:
 if 'displayed_result' not in st.session_state:
     st.session_state.displayed_result = None
 
-input_csvs = st.sidebar.file_uploader("Upload your CSV files", type=['csv'], accept_multiple_files=True)
+input_csvs = st.sidebar.file_uploader("Upload your CSV files", type=['csv'], accept_multiple files=True)
 
 if input_csvs:
     selected_file = st.selectbox("Select a CSV file", [file.name for file in input_csvs])
@@ -69,7 +67,10 @@ if input_csvs:
 
         # Display the result dynamically based on what was set in submit_query
         if st.session_state.displayed_result:
-            if isinstance(st.session_state.displayed_result, str) and st.session_state.displayed_result.endswith(".png"):
+            if isinstance(st.session_state.displayed_result, pd.DataFrame):
+                st.dataframe(st.session_state.displayed_result)
+            elif isinstance(st.session_state.displayed_result, str) and st.session_state.displayed_result.endswith(".png"):
                 st.image(st.session_state.displayed_result)
             else:
                 st.write(st.session_state.displayed_result)
+
