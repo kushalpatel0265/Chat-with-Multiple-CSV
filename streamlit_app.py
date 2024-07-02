@@ -23,8 +23,11 @@ if input_csvs:
     st.info("CSV uploaded successfully")
     data = pd.read_csv(input_csvs[selected_index])
 
-    input_text = st.text_area("Enter the query")
+    # Store input text to keep it in the text area after submission
+    input_text = st.text_area("Enter the query", value=st.session_state.get('input_text', ''))
     if st.button("Submit"):
+        # Update session state to keep text after re-running the script
+        st.session_state['input_text'] = input_text
         if input_text:
             result = chat_with_csv(data, input_text)
             if isinstance(result, pd.DataFrame):
