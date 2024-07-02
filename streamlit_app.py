@@ -11,12 +11,37 @@ def chat_with_csv(df, query):
     result = pandas_ai.chat(query)
     return result
 
+def submit_query():
+    input_text = st.session_state.input_text
+    if input_text:
+        result = chat_with_csv(data, input_text)
+        if isinstance(result, pd.DataFrame):
+            # Convert DataFrame to markdown for display purposes
+            result = "Data Table Displayed Below"
+            st.session_state.chat_history.append((input_text, result))
+            st.session_state.displayed_result = result
+        elif isinstance(result, str) and result.endswith(".png"):
+            image_path = os.path.join('/mount/src/chat-with-multiple-csv/exports/charts', result)
+            st.session_state.chat_history.append((input_text, "Image Displayed Below"))
+            st.session_state.displayed_result = image_path
+        else:
+            st.session_state.chat_history.append((input_text, result))
+            st.session_state.displayed_result = result
+        # Clear the text area after submission
+        st.session_state.input_text = ""
+    else:
+        st.error("Please enter a query to chat with the CSV data.")
+
 st.set_page_config(layout='wide')
 st.title("Chat with Multiple CSV")
 
-# Initialize or extend the chat history in session state
+# Initialize session state variables
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
+if 'input_text' not in st.session_state:
+    st.session_state.input_text = ""
+if 'displayed_result' not in st.session_state:
+    st.session_state.displayed_result = None
 
 input_csvs = st.sidebar.file_uploader("Upload your CSV files", type=['csv'], accept_multiple_files=True)
 
@@ -38,24 +63,13 @@ if input_csvs:
             st.markdown("---")
 
     with col2:
-        input_text = st.text_area("Enter your query", "")
+        st.text_area("Enter your query", key='input_text', on_change=None)
+        if st.button("Submit", on_click=submit_query):
+            pass  # Button action is handled by the submit_query function
 
-        if st.button("Submit", key="submit"):
-            if input_text:
-                result = chat_with_csv(data, input_text)
-                if isinstance(result, pd.DataFrame):
-                    # Convert DataFrame to markdown for display purposes
-                    result = "Data Table Displayed Below"
-                    st.session_state.chat_history.append((input_text, result))
-                    st.dataframe(result)
-                elif isinstance(result, str) and result.endswith(".png"):
-                    image_path = os.path.join('/mount/src/chat-with-multiple-csv/exports/charts', result)
-                    st.session_state.chat_history.append((input_text, "Image Displayed Below"))
-                    st.image(image_path)
-                else:
-                    st.session_state.chat_history.append((input_text, result))
-                    st.success(result)
+        # Display the result dynamically based on what was set in submit_query
+        if st.session_state.displayed_result:
+            if isinstance(st.session_state.displayed_result, str) and st.session_state.displayed_result.endswith(".png"):
+                st.image(st.session_state.displayed_result)
             else:
-                st.error("Please enter a query to chat with the CSV data.")
-            # Clear the text area after submission
-            st.session_state.input_text = ""
+                st.write(st.session_state.displayed_result)
