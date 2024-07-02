@@ -28,7 +28,7 @@ if data_source == "CSV":
 elif data_source == "Database":
     db_file = st.sidebar.file_uploader("Upload your SQLite Database file", type=['db'], accept_multiple_files=False)
     if db_file:
-        conn = sqlite3.connect(db_file)
+        conn =  SqliteConnector(config={"database" : "db_file"})
         st.info("Database connected successfully.")
 
 input_text = st.text_area("Enter the query:")
