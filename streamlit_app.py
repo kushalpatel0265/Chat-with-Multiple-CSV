@@ -41,7 +41,7 @@ if 'input_text' not in st.session_state:
 if 'displayed_result' not in st.session_state:
     st.session_state.displayed_result = None
 
-input_csvs = st.sidebar.file_uploader("Upload your CSV files", type=['csv'], accept_multiple files=True)
+input_csvs = st.sidebar.file_uploader("Upload your CSV files", type=['csv'], accept_multiple_files=True)
 
 if input_csvs:
     selected_file = st.selectbox("Select a CSV file", [file.name for file in input_csvs])
