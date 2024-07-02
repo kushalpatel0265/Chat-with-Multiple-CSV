@@ -16,22 +16,21 @@ def submit_query():
     if input_text:
         result = chat_with_csv(data, input_text)
         if isinstance(result, pd.DataFrame):
-            result_display = "Data Table Displayed Below"
-            st.session_state.chat_history.append((input_text, result_display))
-            st.dataframe(result)
+            # Convert DataFrame to markdown for display purposes
+            result = "Data Table Displayed Below"
+            st.session_state.chat_history.append((input_text, result))
+            st.session_state.displayed_result = result
         elif isinstance(result, str) and result.endswith(".png"):
-            # Check if the last query was a visualization to avoid displaying image again
-            if not st.session_state.chat_history or "Image Displayed Below" not in st.session_state.chat_history[-1][1]:
-                image_path = os.path.join('/mount/src/chat-with-multiple-csv/exports/charts', result)
-                st.session_state.chat_history.append((input_text, "Image Displayed Below"))
-                st.image(image_path)
-            else:
-                st.session_state.chat_history.append((input_text, "Image Displayed Below"))
+            image_path = os.path.join('/mount/src/chat-with-multiple-csv/exports/charts', result)
+            st.session_state.chat_history.append((input_text, "Image Displayed Below"))
+            st.session_state.displayed_result = image_path
         else:
             st.session_state.chat_history.append((input_text, result))
-            st.success(result)
+            st.session_state.displayed_result = result
         # Clear the text area after submission
         st.session_state.input_text = ""
+    else:
+        st.error("Please enter a query to chat with the CSV data.")
 
 st.set_page_config(layout='wide')
 st.title("Chat with Multiple CSV")
