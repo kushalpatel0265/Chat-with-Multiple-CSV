@@ -2,7 +2,7 @@ from pandasai import SmartDataframe
 from pandasai.llm import GooglePalm
 import streamlit as st
 import pandas as pd
-import yaml 
+import os
 
 def chat_with_csv(df, query):
     llm = GooglePalm(api_key="AIzaSyCFZdU4u6NSI1iqHdDeHK2YOLOq6k3fN2M")
@@ -11,15 +11,12 @@ def chat_with_csv(df, query):
     result = pandas_ai.chat(query)
     return result
 
-
 st.set_page_config(layout='wide')
-
 st.title("Chat with Multiple CSV")
 
 input_csvs = st.sidebar.file_uploader("Upload your CSV files", type=['csv'], accept_multiple_files=True)
 
 if input_csvs:
-    # Select a CSV file from the uploaded files using a dropdown menu
     selected_file = st.selectbox("Select a CSV file", [file.name for file in input_csvs])
     selected_index = [file.name for file in input_csvs].index(selected_file)
 
@@ -32,6 +29,9 @@ if input_csvs:
             result = chat_with_csv(data, input_text)
             if isinstance(result, pd.DataFrame):
                 st.dataframe(result)
+            elif isinstance(result, str) and result.endswith(".png"):
+                image_path = os.path.join('/mount/src/chat-with-multiple-csv/exports/charts', result)
+                st.image(image_path)
             else:
                 st.success(result)
         else:
